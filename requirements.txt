@@ -1,0 +1,2 @@
+geopandas
+qgis-plugin-ci
