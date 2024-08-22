@@ -21,6 +21,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+import logging.config
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import *
@@ -32,6 +33,27 @@ from .QuarterCrawl_dialog import QuarterCrawlDialog
 from .quarter import *
 import os.path
 
+from datetime import datetime
+import logging
+
+LOG_FILENAMER = lambda: datetime.now().strftime(f"{LOCAL_DIR}/logs/%Y-%m-%d_%H-%M-%S.log")
+LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+def _update_log_filename():
+    # Generate a new log filename based on the current time
+    new_log_filename = LOG_FILENAMER()
+    
+    # Remove existing file handlers (if any)
+    root_logger = logging.getLogger()
+    for handler in root_logger.handlers[:]:
+        if isinstance(handler, logging.FileHandler):
+            root_logger.removeHandler(handler)
+    
+    # Add a new file handler with the updated filename
+    file_handler = logging.FileHandler(new_log_filename)
+    formatter = logging.Formatter(LOG_FORMAT)
+    file_handler.setFormatter(formatter)
+    root_logger.addHandler(file_handler)
 
 class QuarterCrawl:
     """QGIS Plugin Implementation."""
@@ -46,8 +68,10 @@ class QuarterCrawl:
         """
         # Save reference to the QGIS interface
         self.iface = iface
+
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
+
         # initialize locale
         locale = QSettings().value('locale/userLocale')[0:2]
         locale_path = os.path.join(
@@ -189,9 +213,20 @@ class QuarterCrawl:
 
 
     def generate_grids(self):
+        # Init logging
+        logging.basicConfig(
+            level=logging.INFO,  # Set the logging level to debug
+            format=LOG_FORMAT,  # Define the log format
+            datefmt='%Y-%m-%d %H:%M:%S',  # Define the date format
+            filename=LOG_FILENAMER(),  # Log to a file
+            filemode='w'  # Overwrite the log file each time
+        )
+
+        # `logging.basicConfig` cannot take action twice in one run
+        _update_log_filename()
+
         input = self.dlg.mQgsFileWidget.filePath()
         spin_value = self.dlg.mQgsSpinBox.value()
-
 
         # Prompt the user to enter the filename
         filename, _ = QFileDialog.getSaveFileName(self.iface.mainWindow(), "Save File", "", "Text files (*.geojson)")
@@ -219,7 +254,6 @@ class QuarterCrawl:
 
     def crawl_images(self):
         spin_value = self.dlg.mQgsSpinBox_2.value()
-        print("hello")
         # Open a folder dialog to specify the destination folder
         folder_dialog = QFileDialog()
         folder_dialog.setFileMode(QFileDialog.Directory)

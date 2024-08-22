@@ -1,0 +1,49 @@
+{
+    "type": "FeatureCollection",
+    "name": "quadtree",
+    "crs": {
+        "type": "name",
+        "properties": {
+            "name": "urn:ogc:def:crs:EPSG::3857"
+        }
+    },
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "id": 0,
+                "left": 102.1445847,
+                "top": 24.006355,
+                "right": 117.7695847,
+                "bottom": 8.381355
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            102.1445847,
+                            24.006355
+                        ],
+                        [
+                            117.7695847,
+                            24.006355
+                        ],
+                        [
+                            117.7695847,
+                            8.381355
+                        ],
+                        [
+                            102.1445847,
+                            8.381355
+                        ],
+                        [
+                            102.1445847,
+                            24.006355
+                        ]
+                    ]
+                ]
+            }
+        }
+    ]
+}
